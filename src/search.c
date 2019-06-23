@@ -573,9 +573,7 @@ void *search_thread(void *thread_data)
   score = prev_score = 0;
   for (depth = 1; depth <= search_status.max_depth; depth ++)
   {
-    pthread_mutex_lock(&search_settings.mutex);
     search_depth_cnt = ++shared_search_depth_cnt[depth];
-    pthread_mutex_unlock(&search_settings.mutex);
 
     if (sd->tid && depth > 1 && depth < search_status.max_depth &&
         search_depth_cnt > _max((search_settings.max_threads + 1) / 2, 2))
@@ -624,11 +622,9 @@ void *search_thread(void *thread_data)
   {
     uci_info(pv);
 
-    pthread_mutex_lock(&search_settings.mutex);
     search_status.search_finished = 1;
     if (!search_status.go.ponder)
       search_status.done = 1;
-    pthread_mutex_unlock(&search_settings.mutex);
   }
 
   return NULL;
@@ -713,7 +709,6 @@ void *search()
   int t;
   move_t tb_move;
   search_data_t *sd;
-  pthread_t threads[MAX_THREADS];
 
   sd = search_settings.sd;
   search_status.tm_steps = 0;
@@ -750,24 +745,19 @@ void *search()
 
   // launch search threads
   for (t = 0; t < search_settings.max_threads; t ++)
-    pthread_create(&threads[t], NULL, search_thread, (void *) &search_settings.threads_search_data[t]);
+    search_thread(&search_settings.threads_search_data[t]);
 
   while (!search_status.done)
   {
-    pthread_mutex_lock(&search_settings.mutex);
     if (!search_status.go.infinite &&
         !search_status.go.ponder &&
         time_in_ms() - search_status.time_in_ms >= search_status.max_time &&
         search_status.depth >= MIN_DEPTH_TO_REACH)
       search_status.done = 1;
-    pthread_mutex_unlock(&search_settings.mutex);
 
     sleep_ms(2);
   }
-
-  for (t = 0; t < search_settings.max_threads; t ++)
-    pthread_join(threads[t], NULL);
-
+  
   print_best_move(sd);
   return NULL;
 }

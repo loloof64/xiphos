@@ -688,7 +688,6 @@ static int probe_wdl_table(const struct pos *pos, int *success)
     ptr = ptr2[i].ptr;
     if (!ptr->ready)
     {
-        LOCK(TB_MUTEX);
         if (!ptr->ready)
         {
             char str[16];
@@ -697,7 +696,6 @@ static int probe_wdl_table(const struct pos *pos, int *success)
             {
                 ptr2[i].key = 0ULL;
                 *success = 0;
-                UNLOCK(TB_MUTEX);
                 return 0;
             }
             // Memory barrier to ensure ptr->ready = 1 is not reordered.
@@ -710,7 +708,6 @@ static int probe_wdl_table(const struct pos *pos, int *success)
 #endif
             ptr->ready = 1;
         }
-        UNLOCK(TB_MUTEX);
     }
 
     int bside, mirror, cmirror;

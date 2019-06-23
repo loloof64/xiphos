@@ -20,7 +20,6 @@
 #define HASH_H
 
 #include "game.h"
-#include "pthread.h"
 #include "search.h"
 
 enum {

@@ -390,7 +390,6 @@ void set_syzygy_probe_depth(int depth)
 
 void uci()
 {
-  pthread_t main_search_thread;
   int searching;
   char *buf, input_buf[READ_BUFFER_SIZE];
 
@@ -399,9 +398,8 @@ void uci()
   searching = 0;
   search_settings.sd = (search_data_t *) malloc(sizeof(search_data_t));
   search_settings.threads_search_data = NULL;
-  pthread_mutex_init(&search_settings.mutex, NULL);
 
-  set_max_threads(DEFAULT_THREADS);
+  set_max_threads(1);
   set_hash_size(DEFAULT_HASH_SIZE_IN_MB);
   search_settings.ponder_mode = 0;
   search_settings.tb_probe_depth = 1;
@@ -426,7 +424,6 @@ void uci()
       _p("id name %s %s\n", VERSION, ARCH);
       _p("id author %s\n", AUTHOR);
       _p("option name Hash type spin default %d min 1 max 32768\n", DEFAULT_HASH_SIZE_IN_MB);
-      _p("option name Threads type spin default 1 min 1 max %d\n", MAX_THREADS);
       _p("option name Ponder type check default false\n");
       _p("option name SyzygyPath type string default <empty>\n");
       _p("option name SyzygyProbeDepth type spin default 1 min 1 max %d\n", MAX_DEPTH);
@@ -441,29 +438,23 @@ void uci()
 
     else if (_cmd_cmp(&buf, CMD_STOP))
     {
-      pthread_mutex_lock(&search_settings.mutex);
       search_status.done = 1;
       search_status.go.infinite = 0;
       search_status.go.ponder = 0;
-      pthread_mutex_unlock(&search_settings.mutex);
 
       if (searching)
       {
-        pthread_join(main_search_thread, NULL);
         searching = 0;
       }
     }
     else if (_cmd_cmp(&buf, CMD_PONDERHIT))
     {
-      pthread_mutex_lock(&search_settings.mutex);
       search_status.go.ponder = 0;
       if (search_status.search_finished)
         search_status.done = 1;
-      pthread_mutex_unlock(&search_settings.mutex);
 
       if (search_status.done && searching)
       {
-        pthread_join(main_search_thread, NULL);
         searching = 0;
       }
     }
@@ -492,9 +483,6 @@ void uci()
     else if (_cmd_cmp(&buf, OPTION_HASH))
       set_hash_size(atoi(buf));
 
-    else if (_cmd_cmp(&buf, OPTION_THREADS))
-      set_max_threads(atoi(buf));
-
     else if (_cmd_cmp(&buf, OPTION_PONDER))
       set_ponder(buf);
 
@@ -506,11 +494,8 @@ void uci()
 
     else if (_cmd_cmp(&buf, CMD_GO))
     {
-      if (searching)
-        pthread_join(main_search_thread, NULL);
-
       parse_go_cmd(buf);
-      pthread_create(&main_search_thread, NULL, search, NULL);
+      search();
       searching = 1;
     }
   }

@@ -66,10 +66,6 @@
 #define TB_WPAWN TB_PAWN
 #define TB_BPAWN (TB_PAWN | 8)
 
-#ifndef TB_NO_THREADS
-static LOCK_T TB_MUTEX;
-#endif
-
 #ifdef TB_CUSTOM_BSWAP32
 #define internal_bswap32(x) TB_CUSTOM_BSWAP32(x)
 #else
@@ -357,8 +353,6 @@ void init_tablebases(const char *path)
     paths[i] = &path_string[j];
     while (path_string[j]) j++;
   }
-
-  LOCK_INIT(TB_MUTEX);
 
   TBnum_piece = TBnum_pawn = 0;
   TB_LARGEST = 0;

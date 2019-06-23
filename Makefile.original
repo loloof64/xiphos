@@ -1,6 +1,7 @@
+
 CC = gcc
-CFLAGS = -O3 -flto -Wall -g3
-LIBS = -lm
+CFLAGS = -O3 -flto -Wall
+LIBS = -lm -lpthread
 
 TARGET = xiphos
 SRCS = src/*.c src/fathom/tbprobe.c

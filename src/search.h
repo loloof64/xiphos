@@ -19,8 +19,6 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#include <pthread.h>
-
 #include "move.h"
 #include "position.h"
 #include "util.h"
@@ -51,7 +49,6 @@ struct {
 struct {
   int max_threads, ponder_mode, tb_probe_depth;
   search_data_t *sd, *threads_search_data;
-  pthread_mutex_t mutex;
 } search_settings;
 
 void init_lmr();
