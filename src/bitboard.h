@@ -16,6 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <emscripten.h>
+
 #ifndef BITBOARD_H
 #define BITBOARD_H
 
@@ -66,7 +68,7 @@ static inline int _bsf(uint64_t b)
   return __builtin_ctzll(b);
 #else
   uint64_t r;
-  asm("bsfq %1, %0" : "=r" (r) : "r" (b));
+  EM_ASM("bsfq %1, %0" : "=r" (r) : "r" (b));
   return r;
 #endif
 }
@@ -81,7 +83,7 @@ static inline int _popcnt(uint64_t b)
          popcnt_lookup[b >> 48];
 #else
   uint64_t r;
-  asm("popcntq %1, %0" : "=r" (r) : "r" (b));
+  EM_ASM("popcntq %1, %0" : "=r" (r) : "r" (b));
   return r;
 #endif
 }
@@ -90,7 +92,7 @@ static inline int _popcnt(uint64_t b)
   static inline uint64_t _pext(uint64_t occ, uint64_t mask)
   {
     uint64_t r;
-    asm("pextq %2, %1, %0" : "=r" (r) : "r" (occ), "r" (mask));
+    EM_ASM("pextq %2, %1, %0" : "=r" (r) : "r" (occ), "r" (mask));
     return r;
   }
 #endif

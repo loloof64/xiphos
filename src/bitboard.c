@@ -212,7 +212,7 @@ static inline uint64_t _pdep(uint64_t occ, uint64_t mask)
 {
 #ifdef _BMI2
   uint64_t r;
-  asm("pdepq %2, %1, %0" : "=r" (r) : "r" (occ), "r" (mask));
+  EM_ASM("pdepq %2, %1, %0" : "=r" (r) : "r" (occ), "r" (mask));
 #else
   uint64_t r, i;
   r = 0; i = 1;

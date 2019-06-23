@@ -19,9 +19,6 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#ifndef _NOPOPCNT
-  #include <xmmintrin.h>
-#endif
 #include "bitboard.h"
 #include "game.h"
 #include "move.h"
@@ -67,10 +64,10 @@ static inline void position_cpy(position_t *dest, position_t *src)
 #ifdef _NOPOPCNT
   *dest = *src;
 #else
-  register __m128 x0, x1, x2, x3, x4, x5, *s, *d;
+  int x0, x1, x2, x3, x4, x5, *s, *d;
 
-  s = (__m128 *)src;
-  d = (__m128 *)dest;
+  s = (int *)src;
+  d = (int *)dest;
 
   x0 = s[0]; x1 = s[1]; x2 = s[2]; x3 = s[3]; x4 = s[4]; x5 = s[5];
   d[0] = x0; d[1] = x1; d[2] = x2; d[3] = x3; d[4] = x4; d[5] = x5;

@@ -1,9 +1,12 @@
 CC = gcc
-CFLAGS = -O3 -flto -Wall -g3
+CFLAGS = -O3 -flto -Wall
 LIBS = -lm
 
 TARGET = xiphos
 SRCS = src/*.c src/fathom/tbprobe.c
+
+js:
+	emcc $(CFLAGS) -g3 $(SRCS) -o $(TARGET).html $(LIBS)
 
 sse:
 	$(CC) $(CFLAGS) -msse $(SRCS) -o $(TARGET)-sse $(LIBS)
